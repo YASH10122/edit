@@ -158,4 +158,14 @@ router.put('/:id', async (req, res) => {
   }
 })
 
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const listing = await Listing.findByIdAndDelete(id);
+    res.json(listing)
+
+  } catch (error) {
+    res.status(404).json({ message: "Listing can not found!", error: err.message })
+  }
+})
 module.exports = router

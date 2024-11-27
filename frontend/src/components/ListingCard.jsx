@@ -124,13 +124,13 @@ const ListingCard = ({
               
             }}
           >edit</button>
-          <button
+          {/* <button
             className="book-button"
             onClick={() => {
               navigate(`/properties/${listingId}`);
             }
             }
-          >View</button>
+          >View</button> */}
         </>
       ) : (
         <>

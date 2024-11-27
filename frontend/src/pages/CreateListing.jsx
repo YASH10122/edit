@@ -14,61 +14,58 @@ import { ResponsiveTable } from "responsive-table-react";
 //import Footer from "../components/Footer"
 
 const columns = [
-  {
-    id: "index",
-    text: "ક્રમ",
-  },
-  {
-    id: "aptSuite",
-    text: "aptSuite",
-  },
-  {
-    id: "bathroomCount",
-    text: "bathroomCount",
-  },
-  {
-    id: "guestCount",
-    text: "guestCount",
-  },
+  // {
+  //   id: "index",
+  //   text: "ક્રમ",
+  // },
   {
     id: "category",
     text: "category",
+  },
+  // {
+  //   id: "streetAddress",
+  //   text: "streetAddress",
+  // },
+  {
+    id: "aptSuite",
+    text: "aptSuite",
   },
   {
     id: "city",
     text: "city",
   },
   {
-    id: "newmilkat",
-    text: "નવોમિલ્કતનંબર",
+    id: "country",
+    text: "country",
+  },
+  
+  {
+    id: "guestCount",
+    text: "guestCount",
   },
   {
-    id: "bill1",
-    text: "બિલનંબર_1",
+    id: "bedroomCount",
+    text: "bedroomCount",
   },
   {
-    id: "bill2",
-    text: "બિલનંબર_2",
+    id: "bedCount",
+    text: "bedCount",
   },
   {
-    id: "totalbill",
-    text: "બિલનીકુલરકમ",
+    id: "bathroomCount",
+    text: "bathroomCount",
   },
   {
-    id: "makanuse",
-    text: "મકાનનોઉપયોગ",
+    id: "title",
+    text: "title",
   },
   {
-    id: "gass",
-    text: "ગેસલાઈનગ્રાહકનંબર",
+    id: "description",
+    text: "description",
   },
   {
-    id: "elecnum",
-    text: "ઈલેકટ્રીકગ્રાહકનંબર",
-  },
-  {
-    id: "fire",
-    text: "ફાયરનીવ્યવસ્થા",
+    id: "price",
+    text: "price",
   },
   {
     id: "edit",
@@ -81,12 +78,16 @@ const columns = [
 ];
 
 const CreateListing = () => {
+
+
+
+
   const [category, setCategory] = useState("");
   const [type, setType] = useState("");
   const [data1, setData1] = useState([]);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
+  const [id, setId] = useState();
+  console.log(id);
+
 
 
 
@@ -108,24 +109,32 @@ const CreateListing = () => {
         description: `${item?.description}`,
         country: `${item?.country}`,
         city: `${item?.city}`,
+        title: `${item?.title}`,
         edit: <buttton onClick={() => {
-          console.log(item.id)
-          // const updatedData = {
-          //   aptSuite: "hello", // or any other fields you want to update
-          //   bathroomCount: item.bathroomCount,
-          //   category: item.category,
-          //   guestCount: item.guestCount,
-          //   description: item.description,
-          //   country: item.country,
-          //   city: item.city,
-          // }
-          // axios.put(`localhost:4546/properties/${item?._id}`, updatedData).then(response => {
-          //   console.log('Property updated successfully:', response.data);
-          //   // Optionally, you can refresh the data or update the state
-          //   fetchProperties(); // Call your fetch function to refresh the data
-          // })
+          // console.log(item._id)
+          setId(item?._id);
+          setFormDescription({
+            title: item.title,
+            description: item.description,
+            price: item.price || 0,
+          });
+          setGuestCount(item?.guestCount)
+          setBathroomCount(item?.bathroomCount)
+          setBedCount(item?.bedCount)
+          setBedroomCount(item?.bedroomCount)
+          setFormLocation({
+            streetAddress: item?.streetAddress,
+            aptSuite: item?.aptSuite,
+            city: item?.city,
+            country: item?.country,
+          })
 
-        }}>Edit</buttton>
+        }}>Edit</buttton>,
+        delete: <button type="button" onClick={() => {
+          fetch(`http://localhost:4546/properties/${item._id}`, {
+            method: 'DELETE',
+          }).then(fetchProperties())
+        }}>Del</button>
       }));
 
       setData1(formattedData); // Set the formatted data to state
@@ -223,8 +232,8 @@ const CreateListing = () => {
 
   const navigate = useNavigate();
 
-  const handlePost = async (e) => {
-    e.preventDefault();
+  const handlePost = async () => {
+    // e.preventDefault();
 
     try {
       /* Create a new FormData onject to handle file uploads */
@@ -235,7 +244,6 @@ const CreateListing = () => {
       listingForm.append("streetAddress", formLocation.streetAddress);
       listingForm.append("aptSuite", formLocation.aptSuite);
       listingForm.append("city", formLocation.city);
-
       listingForm.append("country", formLocation.country);
       listingForm.append("guestCount", guestCount);
       listingForm.append("bedroomCount", bedroomCount);
@@ -264,13 +272,59 @@ const CreateListing = () => {
       console.log("Publish Listing failed", err.message);
     }
   };
+
+  const handleEdit = async () => {
+    // e.preven
+    try {
+
+      console.log({
+        "streetAddress": formLocation.streetAddress,
+        "aptSuite": formLocation.aptSuite,
+        "city": formLocation.city,
+        "country": formLocation.country,
+        "guestCount": guestCount,
+        "bedroomCount": bedroomCount,
+        "bedCount": bedCount,
+        "bathroomCount": bathroomCount,
+        "title": formDescription.title,
+        "description": formDescription.description,
+        "price": formDescription.price,
+      });
+
+      const response = await fetch(`http://localhost:4546/properties/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json", // Set the content type to JSON
+        },
+        body: JSON.stringify({
+          "streetAddress": formLocation.streetAddress,
+          "aptSuite": formLocation.aptSuite,
+          "city": formLocation.city,
+          "country": formLocation.country,
+          "guestCount": guestCount,
+          "bedroomCount": bedroomCount,
+          "bedCount": bedCount,
+          "bathroomCount": bathroomCount,
+          "title": formDescription.title,
+          "description": formDescription.description,
+          "price": formDescription.price,
+        }),
+      });
+
+      if (response.ok) {
+        navigate("/admin");
+      }
+    } catch (err) {
+      console.log("Publish Listing failed", err.message);
+    }
+  }
   return (
     <>
       <AdminNavbar />
 
       <div className="create-listing">
         <h1>Publish Your Place</h1>
-        <form onSubmit={handlePost}>
+        <form >
           <div className="create-listing_step1">
             <h2>Step 1: Tell us about your place</h2>
             <hr />
@@ -618,8 +672,20 @@ const CreateListing = () => {
             </div>
           </div>
 
-          <button className="submit_btn" type="submit">
-            CREATE YOUR LISTING
+          {/* {id != undefined ? <>
+          </> : <></>} */}
+
+          <button className="submit_btn" type="button" onClick={() => {
+            if (id != undefined) {
+              console.log("not undfnd");
+              handleEdit()
+
+            } else {
+              handlePost()
+            }
+          }}>
+            {id != undefined ? "UPDATE" : "CREATE"}
+            YOUR LISTING
           </button>
         </form>
         <div className="report-container" id="report" style={{ overflowX: "scroll", margin: "20px 0", padding: "20px", border: "1px solid #ccc", borderRadius: "8px", backgroundColor: "#f9f9f9" }}>
